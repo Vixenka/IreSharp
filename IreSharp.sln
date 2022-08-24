@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32714.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IreSharp", "IreSharp\IreSharp.csproj", "{5DDEE144-CC7C-4C39-9C3A-D8FA11953CC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IreSharp", "IreSharp\IreSharp.csproj", "{0954D5DD-D5F5-40DB-A06B-3825B013DA00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IreSharp.Tests", "IreSharp.Tests\IreSharp.Tests.csproj", "{9757C323-7214-46E9-A520-E9C03AEA15AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5DDEE144-CC7C-4C39-9C3A-D8FA11953CC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DDEE144-CC7C-4C39-9C3A-D8FA11953CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DDEE144-CC7C-4C39-9C3A-D8FA11953CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DDEE144-CC7C-4C39-9C3A-D8FA11953CC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0954D5DD-D5F5-40DB-A06B-3825B013DA00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0954D5DD-D5F5-40DB-A06B-3825B013DA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0954D5DD-D5F5-40DB-A06B-3825B013DA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0954D5DD-D5F5-40DB-A06B-3825B013DA00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9757C323-7214-46E9-A520-E9C03AEA15AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9757C323-7214-46E9-A520-E9C03AEA15AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9757C323-7214-46E9-A520-E9C03AEA15AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9757C323-7214-46E9-A520-E9C03AEA15AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
