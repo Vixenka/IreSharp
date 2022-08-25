@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Buffers.Binary;
+using System.Runtime.InteropServices;
 
 namespace IreSharp.Emit;
 
@@ -19,13 +20,57 @@ public class IlGenerator : IlContainer {
     }
 
     /// <summary>
+    /// Puts <paramref name="opCode"/> to stream of instructions with given arguments.
+    /// </summary>
+    /// <param name="opCode">The instruction <see cref="OpCode"/>.</param>
+    /// <param name="argument1">Argument 0.</param>
+    public void Emit(OpCode opCode, uint argument1) {
+        EmitWorker(opCode, typeof(uint));
+
+        Span<byte> span = stackalloc byte[sizeof(uint)];
+        BinaryPrimitives.WriteUInt32LittleEndian(span, argument1);
+        tail.AddRange(span.ToArray());
+    }
+
+    /// <summary>
+    /// Puts <paramref name="opCode"/> to stream of instructions with given arguments.
+    /// </summary>
+    /// <param name="opCode">The instruction <see cref="OpCode"/>.</param>
+    /// <param name="argument1">Argument 0.</param>
+    /// <param name="argument2">Argument 0.</param>
+    public void Emit(OpCode opCode, uint argument1, int argument2) {
+        EmitWorker(opCode, typeof(uint), typeof(int));
+
+        Span<byte> span = stackalloc byte[sizeof(uint) + sizeof(int)];
+        BinaryPrimitives.WriteUInt32LittleEndian(span, argument1);
+        BinaryPrimitives.WriteInt32LittleEndian(span.Slice(sizeof(uint)), argument2);
+        tail.AddRange(span.ToArray());
+    }
+
+    /// <summary>
+    /// Puts <paramref name="opCode"/> to stream of instructions with given arguments.
+    /// </summary>
+    /// <param name="opCode">The instruction <see cref="OpCode"/>.</param>
+    /// <param name="argument1">Argument 0.</param>
+    /// <param name="argument2">Argument 1.</param>
+    public void Emit(OpCode opCode, Type argument1, int argument2) {
+        EmitWorker(opCode, typeof(Type));
+
+        tail.AddRange(argument1.Guid.ToByteArray());
+
+        Span<byte> span = stackalloc byte[sizeof(int)];
+        BinaryPrimitives.WriteInt32LittleEndian(span, argument2);
+        tail.AddRange(span.ToArray());
+    }
+
+    /// <summary>
     /// Returns fragment of instruction tail from <paramref name="start"/> with given <paramref name="length"/>.
     /// </summary>
     /// <param name="start">Start index of instruction tail.</param>
     /// <param name="length">Length of returned fragment of instruction tail.</param>
     /// <returns>Returns fragment of instruction tail.</returns>
-    protected internal override ReadOnlySpan<byte> GetTail(int start, int length) {
-        return CollectionsMarshal.AsSpan(tail).Slice(start, length);
+    protected internal override ReadOnlySpan<byte> GetTail(uint start, uint length) {
+        return CollectionsMarshal.AsSpan(tail).Slice((int)start, (int)length);
     }
 
     private void EmitWorker(OpCode opCode, params System.Type[] expectedTail) {

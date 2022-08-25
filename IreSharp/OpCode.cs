@@ -1,10 +1,29 @@
 ﻿namespace IreSharp;
 
 public enum OpCode : ushort {
+
+    #region MemoryManagment
+
     [OpCodeValidation]
-    BranchBegin,
+    VariableManagmentStart,
     [OpCodeValidation]
-    BranchEnd,
+    VariableManagmentEnd,
+
+    [OpCodeValidation(typeof(Type))]
+    DefineVariable,
+    [OpCodeValidation(typeof(uint))]
+    DropVariable,
+
     [OpCodeValidation]
-    Return
+    Return,
+
+    #endregion
+
+    #region SetOperations
+
+    [OpCodeValidation(typeof(uint), typeof(int))]
+    SetInt32,
+
+    #endregion
+
 }

@@ -16,6 +16,6 @@ public abstract class IlContainer {
     /// <param name="start">Start index of instruction tail.</param>
     /// <param name="length">Length of returned fragment of instruction tail.</param>
     /// <returns>Returns fragment of instruction tail.</returns>
-    protected internal abstract ReadOnlySpan<byte> GetTail(int start, int length);
+    protected internal abstract ReadOnlySpan<byte> GetTail(uint start, uint length);
 
 }

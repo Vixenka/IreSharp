@@ -6,8 +6,8 @@ public class MethodBuilder : Method {
 
     public IlGenerator IlGenerator => (IlGenerator)IlContainer;
 
-    internal MethodBuilder(TypeBuilder reflectionType, string name) : base(
-        Guid.NewGuid(), new IlGenerator(), reflectionType, name
+    internal MethodBuilder(TypeBuilder reflectionType, string name, Type? returnType) : base(
+        Guid.NewGuid(), new IlGenerator(), reflectionType, name, returnType
     ) {
         ReflectionType = reflectionType;
     }

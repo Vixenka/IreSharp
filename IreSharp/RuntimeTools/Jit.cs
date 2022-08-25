@@ -6,22 +6,24 @@ namespace IreSharp.RuntimeTools;
 
 internal static class Jit {
 
-    private static readonly ConcurrentDictionary<Method, nint> jittedMethods =
-        new ConcurrentDictionary<Method, nint>();
+    private static readonly ConcurrentDictionary<Guid, nint> jittedMethods =
+        new ConcurrentDictionary<Guid, nint>();
 
     public static nint GetFunctionPointer(Method method) {
-        return jittedMethods.GetOrAdd(method, JitMethod);
+        return jittedMethods.GetOrAdd(method.Guid, _ => JitMethod(method));
     }
 
     private static nint JitMethod(Method method) {
         Amd64Generator generator = new Amd64Generator();
         DumpJitFunctionSet set = new DumpJitFunctionSet();
-        set.Initialize(new Dictionary<System.Type, JitFunctionSet>(), generator);
+        set.Initialize(new Dictionary<System.Type, JitFunctionSet>(), method, generator);
 
         foreach (Instruction instruction in method.IlContainer.Instructions)
             set.Execute(instruction);
 
-        Console.WriteLine(BitConverter.ToString(generator.ToArray()).Replace("-", ""));
+        string output = BitConverter.ToString(generator.ToArray()).Replace("-", "");
+        Console.WriteLine(output);
+
         return MemoryAllocator.Alloc(generator.ToArray());
     }
 

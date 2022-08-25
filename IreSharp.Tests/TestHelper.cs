@@ -11,11 +11,4 @@ internal static class TestHelper {
         Runtime.Call(method);
     }
 
-    public static T Run<T>(Action<IlGenerator> factory) {
-        MethodBuilder method = TestEmitHelper.NewMethod();
-        factory(method.IlGenerator);
-
-        return Runtime.Call<T>(method);
-    }
-
 }

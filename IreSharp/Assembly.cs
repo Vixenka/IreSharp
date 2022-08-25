@@ -1,7 +1,10 @@
-﻿namespace IreSharp;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace IreSharp;
 
 public abstract class Assembly {
 
+    public abstract IEnumerable<Assembly> Dependencies { get; }
     public abstract IEnumerable<Type> Types { get; }
 
     public Guid Guid { get; }
@@ -13,5 +16,7 @@ public abstract class Assembly {
     }
 
     internal abstract object GetObjectByGuid(Guid guid);
+
+    protected internal abstract bool TryGetObjectByGuidLocal(Guid guid, [NotNullWhen(true)] out object? obj);
 
 }

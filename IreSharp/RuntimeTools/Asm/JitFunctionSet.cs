@@ -9,9 +9,11 @@ internal abstract class JitFunctionSet {
     private Dictionary<System.Type, JitFunctionSet> jitFunctionObjects = null!;
 
     protected Instruction Instruction { get; private set; }
+    protected Method Method { get; private set; } = null!;
     protected AsmGenerator Generator { get; private set; } = null!;
 
     protected OpCode OpCode => Instruction.OpCode;
+    protected Assembly Assembly => Method.Assembly;
 
     static JitFunctionSet() {
         Dictionary<OpCode, MethodInfo> jitFunctions = new Dictionary<OpCode, MethodInfo>();
@@ -35,7 +37,7 @@ internal abstract class JitFunctionSet {
 
         if (!jitFunctionObjects.TryGetValue(jitFunction.DeclaringType!, out JitFunctionSet? jitFunctionObject)) {
             jitFunctionObject = (JitFunctionSet)Activator.CreateInstance(jitFunction.DeclaringType!)!;
-            jitFunctionObject.Initialize(jitFunctionObjects, Generator);
+            jitFunctionObject.Initialize(jitFunctionObjects, Method, Generator);
 
             jitFunctionObjects[jitFunction.DeclaringType!] = jitFunctionObject!;
         }
@@ -48,9 +50,23 @@ internal abstract class JitFunctionSet {
         Instruction = instruction;
     }
 
-    internal void Initialize(Dictionary<System.Type, JitFunctionSet> jitFunctionObjects, AsmGenerator generator) {
+    internal void Initialize(
+        Dictionary<System.Type, JitFunctionSet> jitFunctionObjects, Method method, AsmGenerator generator
+    ) {
         this.jitFunctionObjects = jitFunctionObjects;
+        Method = method;
         Generator = generator;
+    }
+
+    protected T GetFunctionSet<T>() where T : JitFunctionSet {
+        if (!jitFunctionObjects.TryGetValue(typeof(T), out JitFunctionSet? jitFunctionObject)) {
+            jitFunctionObject = (JitFunctionSet)Activator.CreateInstance(typeof(T))!;
+            jitFunctionObject.Initialize(jitFunctionObjects, Method, Generator);
+
+            jitFunctionObjects[typeof(T)] = jitFunctionObject!;
+        }
+
+        return (T)jitFunctionObject;
     }
 
 }
