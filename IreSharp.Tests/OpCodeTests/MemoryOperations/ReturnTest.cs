@@ -1,7 +1,7 @@
 ﻿using IreSharp.Default;
 using IreSharp.Emit;
 
-namespace IreSharp.Tests.OpCodeTests;
+namespace IreSharp.Tests.OpCodeTests.MemoryOperations;
 
 public class ReturnTest {
 

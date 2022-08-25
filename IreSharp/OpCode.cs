@@ -2,7 +2,7 @@
 
 public enum OpCode : ushort {
 
-    #region MemoryManagment
+    #region MemoryOperations
 
     [OpCodeValidation]
     VariableManagmentStart,
@@ -23,6 +23,13 @@ public enum OpCode : ushort {
 
     [OpCodeValidation(typeof(uint), typeof(int))]
     SetInt32,
+
+    #endregion
+
+    #region ArithmeticOperations
+
+    [OpCodeValidation(typeof(uint), typeof(uint))]
+    Add,
 
     #endregion
 

@@ -38,6 +38,21 @@ public class IlGenerator : IlContainer {
     /// <param name="opCode">The instruction <see cref="OpCode"/>.</param>
     /// <param name="argument1">Argument 0.</param>
     /// <param name="argument2">Argument 0.</param>
+    public void Emit(OpCode opCode, uint argument1, uint argument2) {
+        EmitWorker(opCode, typeof(uint), typeof(uint));
+
+        Span<byte> span = stackalloc byte[sizeof(uint) + sizeof(uint)];
+        BinaryPrimitives.WriteUInt32LittleEndian(span, argument1);
+        BinaryPrimitives.WriteUInt32LittleEndian(span.Slice(sizeof(uint)), argument2);
+        tail.AddRange(span.ToArray());
+    }
+
+    /// <summary>
+    /// Puts <paramref name="opCode"/> to stream of instructions with given arguments.
+    /// </summary>
+    /// <param name="opCode">The instruction <see cref="OpCode"/>.</param>
+    /// <param name="argument1">Argument 0.</param>
+    /// <param name="argument2">Argument 0.</param>
     public void Emit(OpCode opCode, uint argument1, int argument2) {
         EmitWorker(opCode, typeof(uint), typeof(int));
 

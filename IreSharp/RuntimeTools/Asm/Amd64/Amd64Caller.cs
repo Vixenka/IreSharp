@@ -31,7 +31,7 @@ internal class Amd64Caller {
         runner.Add(0xd0);
 
         // Mov output to rax.
-        Amd64Variable[] variables = MemoryManagment.GetMethodVariables(method);
+        Amd64Variable[] variables = MemoryOperations.GetMethodVariables(method);
         Amd64Helper.Mov(runner, Amd64Register.Rax, variables[0].Register);
 
         // Ret.

@@ -1,11 +1,11 @@
 ﻿namespace IreSharp.RuntimeTools.Asm.Amd64;
 
-internal class MemoryManagment : Amd64JitFunctionSet {
+internal class MemoryOperations : Amd64JitFunctionSet {
 
-    private static readonly Amd64Register[] generalPurposeRegisters = new Amd64Register[] {
-        Amd64Register.Rax, Amd64Register.Rcx, Amd64Register.Rdx, Amd64Register.Rbx,
-        Amd64Register.R8, Amd64Register.R9, Amd64Register.R10, Amd64Register.R11,
-        Amd64Register.R12, Amd64Register.R13, Amd64Register.R14, Amd64Register.R15
+    private static readonly Amd64RegisterType[] generalPurposeRegisters = new Amd64RegisterType[] {
+        Amd64RegisterType.Rax, Amd64RegisterType.Rcx, Amd64RegisterType.Rdx, Amd64RegisterType.Rbx,
+        Amd64RegisterType.R8, Amd64RegisterType.R9, Amd64RegisterType.R10, Amd64RegisterType.R11,
+        Amd64RegisterType.R12, Amd64RegisterType.R13, Amd64RegisterType.R14, Amd64RegisterType.R15
     };
 
     private readonly List<Amd64Variable> variables = new List<Amd64Variable>();
@@ -15,12 +15,12 @@ internal class MemoryManagment : Amd64JitFunctionSet {
 
         uint a = 92533981;
         uint hashCode = (uint)method.Guid.GetHashCode();
-        Amd64Register register;
+        Amd64RegisterType register;
 
         if (method.ReturnType is not null) {
             a *= hashCode;
             register = generalPurposeRegisters[a % (generalPurposeRegisters.Length - 1)];
-            variables[0] = new Amd64Variable(method.ReturnType, register);
+            variables[0] = new Amd64Variable(method.ReturnType, new Amd64Register(register, Amd64RegisterMode.DWord));
         }
 
         return variables;
@@ -44,7 +44,7 @@ internal class MemoryManagment : Amd64JitFunctionSet {
         }
 
         Type type = (Type)Assembly.GetObjectByGuid(Instruction.ReadGuid());
-        variables.Add(CreateGeneralPurposeVariable(type));
+        variables.Add(CreateGeneralPurposeVariable(type, Amd64RegisterMode.DWord));
     }
 
     [JitFunction(OpCode.Return)]
@@ -56,21 +56,21 @@ internal class MemoryManagment : Amd64JitFunctionSet {
         return variables[(int)index];
     }
 
-    private Amd64Variable CreateGeneralPurposeVariable(Type type) {
+    private Amd64Variable CreateGeneralPurposeVariable(Type type, Amd64RegisterMode mode) {
         uint count = (uint)variables.Count;
         if (count > generalPurposeRegisters.Length)
             throw new NotImplementedException();
 
         count++;
         uint hashCode = (uint)Method.Guid.GetHashCode();
-        Amd64Register register;
+        Amd64RegisterType register;
 
         do {
             count *= hashCode;
             register = generalPurposeRegisters[count % (generalPurposeRegisters.Length - 1)];
-        } while (variables.Any(x => x.Register == register));
+        } while (variables.Any(x => x.Register.Type == register));
 
-        return new Amd64Variable(type, register);
+        return new Amd64Variable(type, new Amd64Register(register, mode));
     }
 
 }

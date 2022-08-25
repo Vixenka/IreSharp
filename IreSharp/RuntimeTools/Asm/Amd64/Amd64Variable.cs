@@ -2,6 +2,6 @@
 
 internal readonly record struct Amd64Variable(Type Type, Amd64Register Register) {
 
-    public bool IsGeneralPurpose => (uint)Register <= 15;
+    public bool IsGeneralPurpose => Register.Type <= Amd64RegisterType.R15;
 
 }
