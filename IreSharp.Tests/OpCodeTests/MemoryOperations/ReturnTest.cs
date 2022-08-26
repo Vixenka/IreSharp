@@ -24,7 +24,7 @@ public class ReturnTest {
         IlGenerator il = method.IlGenerator;
 
         il.Emit(OpCode.VariableManagmentStart);
-        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableType.Return);
+        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableMode.Return);
         il.Emit(OpCode.VariableManagmentEnd);
 
         il.Emit(OpCode.SetInt32, 0, expected);

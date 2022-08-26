@@ -14,13 +14,17 @@ public class AddTest {
         IlGenerator il = method.IlGenerator;
 
         il.Emit(OpCode.VariableManagmentStart);
-        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableType.Return);
-        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableType.None);
+        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableMode.Return);
+        il.Emit(OpCode.DefineVariable, BuiltInTypes.Int32, (int)VariableMode.None);
         il.Emit(OpCode.VariableManagmentEnd);
 
         il.Emit(OpCode.SetInt32, 0u, a);
         il.Emit(OpCode.SetInt32, 1u, b);
         il.Emit(OpCode.Add, 0u, 1u);
+
+        il.Emit(OpCode.VariableManagmentStart);
+        il.Emit(OpCode.DropVariable, 1u);
+        il.Emit(OpCode.VariableManagmentEnd);
 
         il.Emit(OpCode.Return);
 

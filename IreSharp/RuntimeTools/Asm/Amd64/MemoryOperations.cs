@@ -8,7 +8,7 @@ internal class MemoryOperations : Amd64JitFunctionSet {
         Amd64RegisterType.R12, Amd64RegisterType.R13, Amd64RegisterType.R14, Amd64RegisterType.R15
     };
 
-    private readonly List<Amd64Variable> variables = new List<Amd64Variable>();
+    private readonly List<Amd64Variable?> variables = new List<Amd64Variable?>();
 
     public static Amd64Variable[] GetMethodVariables(Method method) {
         Amd64Variable[] variables = new Amd64Variable[method.ReturnType is null ? 0 : 1];
@@ -36,9 +36,9 @@ internal class MemoryOperations : Amd64JitFunctionSet {
 
     [JitFunction(OpCode.DefineVariable)]
     public void DefineVariable() {
-        VariableType variableType = (VariableType)Instruction.ReadInt32(16);
+        VariableMode variableType = (VariableMode)Instruction.ReadInt32(16);
 
-        if (variableType is VariableType.Return) {
+        if (variableType is VariableMode.Return) {
             variables.Add(GetMethodVariables(Method)[0]);
             return;
         }
@@ -47,13 +47,22 @@ internal class MemoryOperations : Amd64JitFunctionSet {
         variables.Add(CreateGeneralPurposeVariable(type, Amd64RegisterMode.DWord));
     }
 
+    [JitFunction(OpCode.DropVariable)]
+    public void DropVariable() {
+        variables[(int)Instruction.ReadUInt32()] = null;
+
+        int index;
+        while ((index = variables.Count - 1) >= 0 && variables[index] is null)
+            variables.RemoveAt(index);
+    }
+
     [JitFunction(OpCode.Return)]
     public void Return() {
         Generator.WriteByte(0xc3);
     }
 
     public Amd64Variable GetVariable(uint index) {
-        return variables[(int)index];
+        return variables[(int)index]!.Value;
     }
 
     private Amd64Variable CreateGeneralPurposeVariable(Type type, Amd64RegisterMode mode) {
@@ -68,7 +77,7 @@ internal class MemoryOperations : Amd64JitFunctionSet {
         do {
             count *= hashCode;
             register = generalPurposeRegisters[count % (generalPurposeRegisters.Length - 1)];
-        } while (variables.Any(x => x.Register.Type == register));
+        } while (variables.Any(x => x.HasValue && x.Value.Register.Type == register));
 
         return new Amd64Variable(type, new Amd64Register(register, mode));
     }

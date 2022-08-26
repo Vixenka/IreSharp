@@ -4,9 +4,9 @@ internal class AddOperation : Amd64JitFunctionSet {
 
     [JitFunction(OpCode.Add)]
     public void Add() {
-        MemoryOperations memoryManagment = GetFunctionSet<MemoryOperations>();
-        Amd64Variable a = memoryManagment.GetVariable(Instruction.ReadUInt32());
-        Amd64Variable b = memoryManagment.GetVariable(Instruction.ReadUInt32(sizeof(uint)));
+        MemoryOperations memory = GetFunctionSet<MemoryOperations>();
+        Amd64Variable a = memory.GetVariable(Instruction.ReadUInt32());
+        Amd64Variable b = memory.GetVariable(Instruction.ReadUInt32(sizeof(uint)));
 
         byte? extension = Amd64Helper.RegisterExtensionOpCode(a.Register, b.Register);
         if (extension.HasValue)
