@@ -32,6 +32,17 @@ internal abstract class JitFunctionSet {
         JitFunctionSet.jitFunctions = jitFunctions;
     }
 
+    public T GetFunctionSet<T>() where T : JitFunctionSet {
+        if (!jitFunctionObjects.TryGetValue(typeof(T), out JitFunctionSet? jitFunctionObject)) {
+            jitFunctionObject = (JitFunctionSet)Activator.CreateInstance(typeof(T))!;
+            jitFunctionObject.Initialize(jitFunctionObjects, Method, Generator);
+
+            jitFunctionObjects[typeof(T)] = jitFunctionObject!;
+        }
+
+        return (T)jitFunctionObject;
+    }
+
     public void Execute(Instruction instruction) {
         MethodInfo jitFunction = jitFunctions[instruction.OpCode];
 
@@ -56,17 +67,6 @@ internal abstract class JitFunctionSet {
         this.jitFunctionObjects = jitFunctionObjects;
         Method = method;
         Generator = generator;
-    }
-
-    protected T GetFunctionSet<T>() where T : JitFunctionSet {
-        if (!jitFunctionObjects.TryGetValue(typeof(T), out JitFunctionSet? jitFunctionObject)) {
-            jitFunctionObject = (JitFunctionSet)Activator.CreateInstance(typeof(T))!;
-            jitFunctionObject.Initialize(jitFunctionObjects, Method, Generator);
-
-            jitFunctionObjects[typeof(T)] = jitFunctionObject!;
-        }
-
-        return (T)jitFunctionObject;
     }
 
 }

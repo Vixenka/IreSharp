@@ -1,10 +1,19 @@
-﻿namespace IreSharp.RuntimeTools.Asm.Amd64;
+﻿using System.Buffers.Binary;
+
+namespace IreSharp.RuntimeTools.Asm.Amd64;
 
 internal static class Amd64Helper {
 
+    public static byte? RegisterExtensionOpCode(Amd64Register register) {
+        if (register.IsX86Register)
+            return null;
+        else
+            return 0x41;
+    }
+
     public static byte? RegisterExtensionOpCode(Amd64Register destination, Amd64Register source) {
-        bool a = destination.Type < Amd64RegisterType.R8;
-        bool b = source.Type < Amd64RegisterType.R8;
+        bool a = destination.IsX86Register;
+        bool b = source.IsX86Register;
 
         if (a && b) {
             return destination.Mode switch {
@@ -66,6 +75,20 @@ internal static class Amd64Helper {
 
         buffer.Add(0x89);
         buffer.Add(RegisterMultiplication(destination, source));
+    }
+
+    public static void Mov(IList<byte> buffer, Amd64Register destination, long value) {
+        byte? extension = RegisterExtensionOpCode(destination, Amd64Register.Rax);
+        if (extension.HasValue)
+            buffer.Add(extension.Value);
+
+        buffer.Add((byte)(0xb8 + ((uint)destination.Type % 8)));
+
+        Span<byte> span = stackalloc byte[sizeof(long)];
+        BinaryPrimitives.WriteInt64LittleEndian(span, value);
+
+        foreach (byte b in span)
+            buffer.Add(b);
     }
 
 }

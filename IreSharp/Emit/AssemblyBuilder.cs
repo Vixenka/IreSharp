@@ -49,7 +49,11 @@ public class AssemblyBuilder : Assembly {
         return type;
     }
 
-    internal void AddDependency(Assembly assembly) {
+    /// <summary>
+    /// Adds dependency to this <see cref="AssemblyBuilder"/>.
+    /// </summary>
+    /// <param name="assembly">Dependency <see cref="Assembly"/>.</param>
+    public void AddDependency(Assembly assembly) {
         if (assembly != this)
             dependencies[assembly] = 0;
     }

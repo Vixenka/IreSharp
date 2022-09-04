@@ -6,25 +6,56 @@ namespace IreSharp.RuntimeTools;
 
 internal static class Jit {
 
-    private static readonly ConcurrentDictionary<Guid, nint> jittedMethods =
-        new ConcurrentDictionary<Guid, nint>();
+    private static readonly ConcurrentDictionary<Guid, JitOutput> jittedMethods =
+        new ConcurrentDictionary<Guid, JitOutput>();
 
-    public static nint GetFunctionPointer(Method method) {
-        return jittedMethods.GetOrAdd(method.Guid, _ => JitMethod(method));
+    public static JitOutput GetJitOutput(Method method) {
+        return jittedMethods.GetOrAdd(method.Guid, _ => new Amd64JitOutput(method));
     }
 
-    private static nint JitMethod(Method method) {
+    internal static void JitMethod(
+        JitOutput output, int? compilationNesting = null, HashSet<uint>? managedRegisters = null
+    ) {
         Amd64Generator generator = new Amd64Generator();
-        DumpJitFunctionSet set = new DumpJitFunctionSet();
-        set.Initialize(new Dictionary<System.Type, JitFunctionSet>(), method, generator);
+        CommonFunctionSet set = new CommonFunctionSet(compilationNesting ?? 8);
+        set.Initialize(new Dictionary<System.Type, JitFunctionSet> {
+            { typeof(CommonFunctionSet), set }
+        }, output.Method, generator);
 
-        foreach (Instruction instruction in method.IlContainer.Instructions)
-            set.Execute(instruction);
+        if (managedRegisters is null) {
+            output.CreateFunctionPointer(_ => {
+                foreach (Instruction instruction in output.Method.IlContainer.Instructions)
+                    set.Execute(instruction);
 
-        string output = BitConverter.ToString(generator.ToArray()).Replace("-", "");
-        Console.WriteLine(output);
+                MemoryOperations memory = set.GetFunctionSet<MemoryOperations>();
+                foreach (Amd64RegisterType register in memory.OverridedRegisters)
+                    output.AddOverridedRegister((uint)register);
 
-        return MemoryAllocator.Alloc(generator.ToArray());
+                string s = BitConverter.ToString(generator.ToArray()).Replace("-", "");
+                Console.WriteLine(s);
+
+                return MemoryAllocator.Alloc(generator.ToArray());
+            });
+        } else {
+            MemoryOperations memory = set.GetFunctionSet<MemoryOperations>();
+
+            foreach (Instruction instruction in output.Method.IlContainer.Instructions) {
+                set.Execute(instruction);
+
+                if (memory.NewOverridedRegisters.Count == 0)
+                    continue;
+
+                while (memory.NewOverridedRegisters.TryDequeue(out Amd64RegisterType value)) {
+                    output.AddOverridedRegister((uint)value);
+                    managedRegisters.Remove((uint)value);
+                }
+
+                if (managedRegisters.Count == 0)
+                    return;
+            }
+
+            output.CreateFunctionPointer(_ => MemoryAllocator.Alloc(generator.ToArray()));
+        }
     }
 
 }

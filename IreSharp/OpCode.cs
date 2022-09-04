@@ -9,10 +9,19 @@ public enum OpCode : ushort {
     [OpCodeValidation]
     VariableManagmentEnd,
 
-    [OpCodeValidation(typeof(Type))]
+    [OpCodeValidation(typeof(Type), typeof(int))]
     DefineVariable,
     [OpCodeValidation(typeof(uint))]
     DropVariable,
+
+    #endregion
+
+    #region FunctionOperations
+
+    [OpCodeValidation(typeof(Method))]
+    CallDirectPrepare,
+    [OpCodeValidation]
+    CallDirectExecute,
 
     [OpCodeValidation]
     Return,

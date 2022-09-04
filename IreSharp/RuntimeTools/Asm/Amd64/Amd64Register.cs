@@ -44,4 +44,6 @@ internal readonly record struct Amd64Register(Amd64RegisterType Type, Amd64Regis
 
     #endregion
 
+    public bool IsX86Register => Type < Amd64RegisterType.R8;
+
 }

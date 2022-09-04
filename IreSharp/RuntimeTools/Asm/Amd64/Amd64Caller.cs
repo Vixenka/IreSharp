@@ -7,9 +7,9 @@ internal class Amd64Caller {
 
     private readonly ConcurrentDictionary<Guid, nint> functions = new ConcurrentDictionary<Guid, nint>();
 
-    public nint GetFunctionPointer(Method method) {
+    public nint GetPointer(Method method) {
         if (method.ReturnType is null)
-            return Jit.GetFunctionPointer(method);
+            return Jit.GetJitOutput(method).RunPointer;
 
         return functions.GetOrAdd(method.Guid, _ => CreateCaller(method));
     }
@@ -21,7 +21,7 @@ internal class Amd64Caller {
         };
 
         Span<byte> span = stackalloc byte[sizeof(nint)];
-        BinaryPrimitives.WriteInt64LittleEndian(span, Jit.GetFunctionPointer(method));
+        BinaryPrimitives.WriteInt64LittleEndian(span, Jit.GetJitOutput(method).RunPointer);
 
         foreach (byte b in span)
             runner.Add(b);
@@ -32,7 +32,7 @@ internal class Amd64Caller {
 
         // Mov output to rax.
         Amd64Variable[] variables = MemoryOperations.GetMethodVariables(method);
-        Amd64Helper.Mov(runner, Amd64Register.Rax, variables[0].Register);
+        Amd64Helper.Mov(runner, Amd64Register.Rax, variables[0].Register!.Value);
 
         // Ret.
         runner.Add(0xc3);

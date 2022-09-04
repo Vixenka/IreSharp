@@ -8,12 +8,15 @@ internal class AddOperation : Amd64JitFunctionSet {
         Amd64Variable a = memory.GetVariable(Instruction.ReadUInt32());
         Amd64Variable b = memory.GetVariable(Instruction.ReadUInt32(sizeof(uint)));
 
-        byte? extension = Amd64Helper.RegisterExtensionOpCode(a.Register, b.Register);
+        if (!a.Register.HasValue || !b.Register.HasValue)
+            throw new NotImplementedException();
+
+        byte? extension = Amd64Helper.RegisterExtensionOpCode(a.Register.Value, b.Register.Value);
         if (extension.HasValue)
             Generator.WriteByte(extension.Value);
 
         Generator.WriteByte(0x01);
-        Generator.WriteByte(Amd64Helper.RegisterMultiplication(a.Register, b.Register));
+        Generator.WriteByte(Amd64Helper.RegisterMultiplication(a.Register.Value, b.Register.Value));
     }
 
 }

@@ -11,7 +11,7 @@ public static class Runtime {
     /// </summary>
     /// <param name="method"><see cref="Method"/> to be called.</param>
     public static unsafe void Call(Method method) {
-        ((delegate* unmanaged<void>)Caller.GetFunctionPointer(method))();
+        ((delegate* unmanaged<void>)Caller.GetPointer(method))();
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public static class Runtime {
     /// <param name="method"><see cref="Method"/> to be called.</param>
     /// <returns>T value.</returns>
     public static unsafe T Call<T>(Method method) {
-        return ((delegate* managed<T>)Caller.GetFunctionPointer(method))();
+        return ((delegate* managed<T>)Caller.GetPointer(method))();
     }
 
 }

@@ -3,6 +3,7 @@
 public class MethodBuilder : Method {
 
     public new TypeBuilder ReflectionType { get; }
+    public new AssemblyBuilder Assembly => ReflectionType.Assembly;
 
     public IlGenerator IlGenerator => (IlGenerator)IlContainer;
 
